@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [scrollBgColor, setScrollBgColor] = useState("bg-yellow-500");
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const position = window.scrollY;
+
+      if (position > 100) {
+        setScrollBgColor("bg-slate-50");
+      } else {
+        setScrollBgColor("bg-yellow-500");
+      }
+
+      setScrollPosition(position);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <nav className="bg-slate-50 p-4 border-b-2 border-black sticky top-0">
+    <nav
+      className={`p-4 border-b-2 border-black sticky top-0 ${scrollBgColor} transition-colors duration-300`}
+    >
       <div className="container mx-auto md:flex md:items-center md:justify-between">
         <div className="flex items-center justify-between">
           <div className="text-black text-4xl font-extrabold">InkScribe</div>
