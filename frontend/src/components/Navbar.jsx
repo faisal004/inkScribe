@@ -4,13 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const [scrollPosition, setScrollPosition] = useState(0);
   const [scrollBgColor, setScrollBgColor] = useState("bg-yellow-500");
 
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
+ 
 
   useEffect(() => {
     const handleScroll = () => {
