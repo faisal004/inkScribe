@@ -26,15 +26,15 @@ router.post("/Signup", async (req, res) => {
 });
 router.post("/Login", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email, password });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
     if (user) {
-      const token = jwt.sign({ email, role: "user" }, process.env.SECRET, {
+      const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
         expiresIn: "1h",
       });
       res.json({ message: "Logged in successfully", token });
     } else {
-      res.status(403).json({ message: "Invalid email or password" });
+      res.status(403).json({ message: "Invalid username or password" });
     }
   } catch (error) {
     res.status(500).json({ message: "server error" });
@@ -44,10 +44,15 @@ router.post("/Login", async (req, res) => {
 router.post("/PostBlog", authenticateJwt, async (req, res) => {
   try {
     const { title, mainContent, photos } = req.body;
+    const {username}= req.user;
     const post = new Post({
       title,
       mainContent,
       photos,
+      creator: {
+        username,
+        
+      },
     });
     await post.save();
     res.json({ message: "Post created successfully", PostId: post.id });
@@ -56,4 +61,9 @@ router.post("/PostBlog", authenticateJwt, async (req, res) => {
     res.status(500).json({ error: "Failed to create post" });
   }
 });
+
+router.get("/PostBlog",authenticateJwt,async(req,res)=>{
+  const post= await Post.find({});
+  res.json({post});
+})
 export default router;
