@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/userModel.js";
+import Post from "../models/Post.js";
 import { authenticateJwt } from "../middleware/auth.js";
 import "dotenv/config";
 const router = express.Router();
@@ -37,6 +38,22 @@ router.post("/Login", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "server error" });
+  }
+});
+
+router.post("/PostBlog", authenticateJwt, async (req, res) => {
+  try {
+    const { title, mainContent, photos } = req.body;
+    const post = new Post({
+      title,
+      mainContent,
+      photos,
+    });
+    await post.save();
+    res.json({ message: "Post created successfully", PostId: post.id });
+  } catch (error) {
+    console.error("Error creating post:", error);
+    res.status(500).json({ error: "Failed to create post" });
   }
 });
 export default router;
