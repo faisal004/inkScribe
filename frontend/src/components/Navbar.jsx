@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate=useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [scrollBgColor, setScrollBgColor] = useState("bg-yellow-500");
@@ -35,7 +38,9 @@ const Navbar = () => {
     >
       <div className="container mx-auto md:flex md:items-center md:justify-between">
         <div className="flex items-center justify-between">
-          <div className="text-black text-4xl font-extrabold">InkScribe</div>
+          <div className="text-black text-4xl font-extrabold"><Link to={"/"}>
+          InkScribe
+          </Link></div>
           <button
             className="md:hidden text-black focus:outline-none"
             onClick={toggleMenu}
@@ -65,9 +70,13 @@ const Navbar = () => {
           className={`md:flex ${isMenuOpen ? "block" : "hidden"} mt-4 md:mt-0 `}
         >
           <div className="space-x-10 flex md:flex-row flex-col justify-center ">
-            <button className="">Home</button>
+            <button onClick={()=>{
+              navigate("/")
+            }} className="">Home</button>
 
-            <button className="bg-black text-white rounded-full py-1 px-2">
+            <button onClick={()=>{
+              navigate("/Login")
+            }} className="bg-black text-white rounded-full py-1 px-2">
               Get started
             </button>
           </div>
