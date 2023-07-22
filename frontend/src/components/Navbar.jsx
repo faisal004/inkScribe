@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { userState } from "../../Recoil/stateManagement";
 
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState} from "recoil";
 
 const Navbar = () => {
   const navigate = useNavigate();
