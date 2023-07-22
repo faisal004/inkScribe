@@ -1,6 +1,12 @@
 import { atom } from "recoil";
 import { selector } from "recoil";
 
+
+export const userState = atom({
+  key: "userState",
+  default: false,
+});
+
 export const loginState = atom({
   key: "loginState",
   default: {

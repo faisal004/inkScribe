@@ -1,10 +1,13 @@
 import { TextField } from "@mui/material";
 import { Link } from "react-router-dom";
-import { useRecoilState, useRecoilValueLoadable } from "recoil";
-import { loginState, loginAPI } from "../../Recoil/stateManagement";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useSetRecoilState, useRecoilValueLoadable } from "recoil";
+import { loginState, loginAPI,userState } from "../../Recoil/stateManagement";
 
 const Login = () => {
-  const [loginData,setLoginData] = useRecoilState(loginState);
+  const setLoginData = useSetRecoilState(loginState);
+  const setUser=useSetRecoilState(userState);
   const loginAPILoadable = useRecoilValueLoadable(loginAPI);
 
   const handleChange = (e) => {
@@ -20,7 +23,36 @@ const Login = () => {
     const apiResponse = loginAPILoadable.contents;
 
     if (loginAPILoadable.state === "hasValue") {
+      if(apiResponse.message==="Invalid username or password"){
+        toast.error("Invalid username or password", {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
+        console.log("API Response:", apiResponse);
+
+      }else{
+        localStorage.setItem("token", apiResponse.token);
+      setUser(true);
+      toast.success("Logged in successfully", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
       console.log("API Response:", apiResponse);
+
+      }
+      
     } else if (loginAPILoadable.state === "loading") {
       console.log("API call in progress...");
     } else if (loginAPILoadable.state === "hasError") {
@@ -40,6 +72,7 @@ const Login = () => {
               name="username"
               onChange={handleChange}
               variant="outlined"
+              required
             />
           </div>
           <div>
@@ -50,6 +83,7 @@ const Login = () => {
               type="password"
               onChange={handleChange}
               variant="outlined"
+              required
             />
           </div>
           <div className="">
@@ -68,6 +102,7 @@ const Login = () => {
           </Link>{" "}
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 };
