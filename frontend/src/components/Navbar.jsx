@@ -45,7 +45,7 @@ const Navbar = () => {
         </div>
         <div className={` `}>
           {user ? (
-            <button
+            <button className="bg-black text-white rounded-full py-1 px-2"
               onClick={() => {
                 localStorage.removeItem("token");
                 setUser(false);
