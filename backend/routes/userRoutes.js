@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt"
 import User from "../models/userModel.js";
 import Post from "../models/Post.js";
 import { authenticateJwt } from "../middleware/auth.js";
@@ -13,7 +14,8 @@ router.post("/Signup", async (req, res) => {
     if (user) {
       res.status(403).json({ message: "User Exist" });
     } else {
-      const newUser = new User({ username, email, password });
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({ username, email, password: hashedPassword});
       await newUser.save();
       const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
         expiresIn: "1h",
@@ -27,12 +29,20 @@ router.post("/Signup", async (req, res) => {
 router.post("/Login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username, password });
+    const user = await User.findOne({ username});
     if (user) {
-      const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
-        expiresIn: "1h",
-      });
-      res.json({ message: "Logged in successfully", token });
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        // Passwords match, generate and send the JWT token
+        const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
+          expiresIn: "1h",
+        });
+        res.json({ message: "Logged in successfully", token });
+      } else {
+        // Passwords do not match
+        res.status(403).json({ message: "Invalid username or password" });
+      }
     } else {
       res.status(403).json({ message: "Invalid username or password" });
     }
