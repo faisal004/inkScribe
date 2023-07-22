@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { userState } from "../../Recoil/stateManagement";
-
-import { useRecoilState} from "recoil";
+import {BsFillPenFill} from "react-icons/bs"
+ 
+import { useRecoilState } from "recoil";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [user,setUser]= useRecoilState(userState);
+  const [user, setUser] = useRecoilState(userState);
   // const setUser = useSetRecoilState(userState);
 
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -45,14 +46,25 @@ const Navbar = () => {
         </div>
         <div className={` `}>
           {user ? (
-            <button className="bg-black text-white rounded-full py-1 px-2"
-              onClick={() => {
-                localStorage.removeItem("token");
-                setUser(false);
-              }}
-            >
-              Logout
-            </button>
+            <>
+            <div className="space-x-5">
+            <button   onClick={() => {
+                  
+                navigate("/Write")
+                }}> <BsFillPenFill/></button>
+              <button
+                className="bg-black text-white rounded-full py-1 px-2"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  setUser(false);
+                }}
+              >
+                Logout
+              </button>
+
+            </div>
+              
+            </>
           ) : (
             <div className="space-x-10 justify-center">
               <button

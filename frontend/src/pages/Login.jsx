@@ -1,11 +1,15 @@
+import { useEffect } from "react";
 import { TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { loginState, loginAPI,userState } from "../../Recoil/stateManagement";
+import { useNavigate } from "react-router-dom";
+
 
 const Login = () => {
+  const navigate = useNavigate();
   const setLoginData = useSetRecoilState(loginState);
   const setUser=useSetRecoilState(userState);
   const loginAPILoadable = useRecoilValueLoadable(loginAPI);
@@ -38,6 +42,7 @@ const Login = () => {
 
       }else{
         localStorage.setItem("token", apiResponse.token);
+        
       setUser(true);
       toast.success("Logged in successfully", {
         position: "bottom-center",
@@ -49,6 +54,11 @@ const Login = () => {
         progress: undefined,
         theme: "light",
         });
+        setTimeout(() => {
+          navigate("/Home")
+          
+        }, 1000);
+       
       console.log("API Response:", apiResponse);
 
       }
@@ -59,6 +69,16 @@ const Login = () => {
       console.error("API Error:", loginAPILoadable.contents);
     }
   };
+  useEffect(() => {
+    console.log("useEffect: Checking for token...");
+    const authToken = localStorage.getItem("token");
+    console.log("Token found:", authToken);
+  
+    if (authToken) {
+      console.log("Setting userState to true...");
+      setUser(true);
+    }
+  }, [setUser]);
 
   return (
     <div className="bg-slate-50 p-10 h-screen ">

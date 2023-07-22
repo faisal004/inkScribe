@@ -8,8 +8,10 @@ import {
   signupAPI,
   userState,
 } from "../../Recoil/stateManagement";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const setSignupData = useSetRecoilState(signupState);
   const setUser = useSetRecoilState(userState);
   const signupAPILoadable = useRecoilValueLoadable(signupAPI);
@@ -51,6 +53,10 @@ const Signup = () => {
           progress: undefined,
           theme: "light",
         });
+        setTimeout(() => {
+          navigate("/Home")
+          
+        }, 1000);
       }
     } else if (signupAPILoadable.state === "loading") {
       console.log("API call in progress...");
