@@ -21,16 +21,11 @@ const postSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    photos: [
-      {
-        url: {
-          type: String,
-        },
-        caption: {
-          type: String,
-        },
-      },
-    ],
+    photos: {
+      type: String,
+      default: "",
+     
+    },
     comments: [
       {
         user: {
