@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { userState } from "../../Recoil/stateManagement";
 
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [user,setUser]= useRecoilState(userState);
+  // const setUser = useSetRecoilState(userState);
 
   const [scrollPosition, setScrollPosition] = useState(0);
   const [scrollBgColor, setScrollBgColor] = useState("bg-yellow-500");
-
- 
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,16 +44,27 @@ const Navbar = () => {
           </div>
         </div>
         <div className={` `}>
-          <div className="space-x-10 justify-center ">
+          {user ? (
             <button
               onClick={() => {
-                navigate("/Login");
+                localStorage.removeItem("token");
+                setUser(false);
               }}
-              className="bg-black text-white rounded-full py-1 px-2"
             >
-              Get started
+              Logout
             </button>
-          </div>
+          ) : (
+            <div className="space-x-10 justify-center">
+              <button
+                onClick={() => {
+                  navigate("/Login");
+                }}
+                className="bg-black text-white rounded-full py-1 px-2"
+              >
+                Get started
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>
