@@ -13,6 +13,7 @@ import {
 } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { userState } from "../Recoil/stateManagement";
+import ArticlePage from "./pages/ArticlePage";
 
 function App() {
   const user = useRecoilValue(userState);
@@ -43,6 +44,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Write />
+              </PrivateRoute>
+            }
+          />
+             <Route
+            path="/Blog/:PostId"
+            element={
+              <PrivateRoute>
+                <ArticlePage />
               </PrivateRoute>
             }
           />

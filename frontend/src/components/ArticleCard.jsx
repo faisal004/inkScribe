@@ -1,47 +1,51 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ArticleCard = ({
-  writerImage,
   writerName,
   articleTitle,
   articleImage,
   articleContent,
-  readTime,
+  readtime,
+  timestamp,
+  _id // Added the missing _id prop.
 }) => {
   return (
-    <>
-    <div className="md:px-10 md:mx-10 ">
-    <div className="bg-slate-50 container mx-auto border-b-2 border-slate-200 ">
-      <div className="flex flex-row space-x-3">
-        <img className="rounded-full h-12 w-12 p-2" src={writerImage} alt="" />
-        <div className="flex flex-row space-x-5 pt-3 ">
-          <div> {writerName}</div>
-
-          <div> PublishedOn </div>
+    <div className="md:px-10 md:mx-10">
+      <Link to={`/Blog/${_id}`}>
+        <div className="bg-slate-50 container mx-auto border-b-2 mt-3 border-slate-200">
+          <div className="flex flex-row space-x-3">
+            <div className="flex flex-row space-x-5 pt-3 px-2">
+              <div>{writerName}</div>
+            </div>
+          </div>
+          <div className="flex flex-row justify-between">
+            <div className="flex flex-col w-2/3">
+              <div className="md:text-2xl text-lg font-semibold p-2 w-5/6">
+                {articleTitle.slice(0, 50)}
+              </div>
+              <div
+                className="hidden md:block p-2"
+                dangerouslySetInnerHTML={{ __html: articleContent.slice(0, 500) }}
+              />
+            </div>
+            <div className="md:w-80 md:h-48 h-24 w-40 pr-2  overflow-hidden shadow-lg mb-4">
+          <img
+            className="object-cover w-full h-full"
+            src={articleImage}
+            alt="Profile"
+          />
         </div>
-      </div>
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-col w-2/3">
-          <div className="md:text-2xl text-lg font-semibold p-2 w-5/6">{articleTitle.slice(0,50)}</div>
-          <div className="hidden md:block p-2">{articleContent.slice(0,100)}</div>
+          </div>
+          <div className="flex flex-row space-x-3">
+            <div className="flex flex-row space-x-5 pb-3 px-2">
+              <div>Read time: {readtime} min read</div>
+              <div>{timestamp}</div>
+            </div>
+          </div>
         </div>
-        <div className="w-1/6 h-1/6 m-4 ">
-          <img className="w-5/6 h-5/6" src={articleImage} alt="" />
-        </div>
-      </div>
-      <div className="flex flex-row space-x-3">
-       
-        <div className="flex flex-row space-x-5 pb-3  ">
-          <div> {writerName}</div>
-
-          <div> PublishedOn </div>
-        </div>
-      </div>
+      </Link>
     </div>
-    </div>
-    
-    </>
-    
   );
 };
 

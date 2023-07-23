@@ -56,3 +56,11 @@ export const signupAPI = selector({
     return data;
   },
 });
+export const editorState = atom({
+  key: "editorState",
+  default: {
+    title: "",
+    mainContent: "",
+    photos: null,
+  },
+});
