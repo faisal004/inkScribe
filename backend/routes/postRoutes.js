@@ -7,44 +7,55 @@ const router = express.Router();
 import jwt from "jsonwebtoken";
 
 router.put("/PostBlog/:PostId?", authenticateJwt, async (req, res) => {
-    const { PostId } = req.params;
-    
-    if (PostId) {
-      
-      try {
-        const post = await Post.findByIdAndUpdate(PostId,req.body,{
-            new:true,
-        });
-        if (!post) {
-          return res.status(404).json({ error: "Post not found" });
-        }
-        return res.json({ post });
-      } catch (err) {
-        console.error("Error fetching post:", err);
-        return res.status(500).json({ error: "Internal server error" });
+  const { PostId } = req.params;
+
+  if (PostId) {
+    try {
+      const post = await Post.findByIdAndUpdate(PostId, req.body, {
+        new: true,
+      });
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
       }
-    } else {
-     
-      try {
-        const posts = await Post.find({});
-        return res.json({ posts });
-      } catch (err) {
-        console.error("Error fetching posts:", err);
-        return res.status(500).json({ error: "Internal server error" });
-      }
+      return res.json({ post });
+    } catch (err) {
+      console.error("Error fetching post:", err);
+      return res.status(500).json({ error: "Internal server error" });
     }
-  });
-  router.get("/PostBlog", async (req, res) => {
+  } else {
     try {
       const posts = await Post.find({});
-      
-      return res.json({ posts});
+      return res.json({ posts });
     } catch (err) {
       console.error("Error fetching posts:", err);
       return res.status(500).json({ error: "Internal server error" });
     }
-  });
-  
+  }
+});
+router.get("/PostBlog", async (req, res) => {
+  try {
+    const posts = await Post.find({});
+
+    return res.json({ posts });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.get("/PostBlog/:PostId", authenticateJwt,async (req, res) => {
+  const { PostId } = req.params;
+
+  try {
+    const post = await Post.findById(PostId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+    return res.json({ post });
+  } catch (err) {
+    console.error("Error fetching post:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 router.patch(
   "/PostBlog/:PostId/UpdateLike",
   authenticateJwt,
@@ -54,14 +65,13 @@ router.patch(
     try {
       const post = await Post.findById(req.params.PostId);
       const user = await User.findOne({ username: req.user.username });
-    
 
       if (!post) {
         return res.status(404).json({ error: "Post not found" });
       }
 
       const userId = user._id;
-      
+
       if (!post.likes) {
         post.likes = [];
       }
@@ -83,6 +93,5 @@ router.patch(
     }
   }
 );
-
 
 export default router;
