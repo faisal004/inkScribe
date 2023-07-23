@@ -34,7 +34,17 @@ router.put("/PostBlog/:PostId?", authenticateJwt, async (req, res) => {
       }
     }
   });
-
+  router.get("/PostBlog", async (req, res) => {
+    try {
+      const posts = await Post.find({});
+      
+      return res.json({ posts});
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 router.patch(
   "/PostBlog/:PostId/UpdateLike",
   authenticateJwt,
