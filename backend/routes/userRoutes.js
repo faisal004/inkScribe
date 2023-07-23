@@ -55,6 +55,7 @@ router.post("/PostBlog", authenticateJwt, async (req, res) => {
   try {
     const { title, mainContent, photos } = req.body;
     const {username}= req.user;
+    
     const post = new Post({
       title,
       mainContent,
@@ -65,6 +66,17 @@ router.post("/PostBlog", authenticateJwt, async (req, res) => {
       },
     });
     await post.save();
+    const user = await User.findOne({ username});
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const userId = user._id;
+    if (!user.publishedPost) {
+      user.publishedPost = [];
+    }
+    user.publishedPost.push(userId);
+    await user.save();
+   
     res.json({ message: "Post created successfully", PostId: post.id });
   } catch (error) {
     console.error("Error creating post:", error);
