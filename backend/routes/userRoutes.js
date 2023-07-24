@@ -1,5 +1,5 @@
 import express from "express";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
 import Post from "../models/Post.js";
 import { authenticateJwt } from "../middleware/auth.js";
@@ -15,12 +15,12 @@ router.post("/Signup", async (req, res) => {
       res.status(403).json({ message: "User Exist" });
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({ username, email, password: hashedPassword});
+      const newUser = new User({ username, email, password: hashedPassword });
       await newUser.save();
       const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
         expiresIn: "5h",
       });
-      res.json({ message: "User Created SuccessFully", token,username });
+      res.json({ message: "User Created SuccessFully", token, username });
     }
   } catch (error) {
     res.status(500).json({ message: "server error" });
@@ -29,7 +29,7 @@ router.post("/Signup", async (req, res) => {
 router.post("/Login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username});
+    const user = await User.findOne({ username });
     if (user) {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
@@ -38,7 +38,7 @@ router.post("/Login", async (req, res) => {
         const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
           expiresIn: "1h",
         });
-        res.json({ message: "Logged in successfully", token ,username});
+        res.json({ message: "Logged in successfully", token, username });
       } else {
         // Passwords do not match
         res.status(403).json({ message: "Invalid username or password" });
@@ -54,29 +54,24 @@ router.post("/Login", async (req, res) => {
 router.post("/PostBlog", authenticateJwt, async (req, res) => {
   try {
     const { title, mainContent, photos } = req.body;
-    const {username}= req.user;
-    
+    const { username } = req.user;
+
     const post = new Post({
       title,
       mainContent,
       photos,
       creator: {
         username,
-        
       },
     });
     await post.save();
-    const user = await User.findOne({ username});
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    const userId = user._id;
-    if (!user.publishedPost) {
-      user.publishedPost = [];
-    }
-    user.publishedPost.push(userId);
+    user.publishedPost.push(post.id);
     await user.save();
-   
+
     res.json({ message: "Post created successfully", PostId: post.id });
   } catch (error) {
     console.error("Error creating post:", error);
@@ -84,19 +79,23 @@ router.post("/PostBlog", authenticateJwt, async (req, res) => {
   }
 });
 
-router.get("/PostBlog",authenticateJwt,async(req,res)=>{
-  const post= await Post.find({});
-  res.json({post});
-})
+router.get("/PostBlog", authenticateJwt, async (req, res) => {
+  const post = await Post.find({});
+  res.json({ post });
+});
 
-router.get("/:username", async (req,res)=>{
-  const {username}=req.params;
-  const user = await User.findOne({ username})
-  
-  if (!user) {
-    return res.status(404).json({ error: "User not found" });
+router.get("/:username", async (req, res) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username }).populate("publishedPost");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json(user);
+  } catch (err) {
+    return res.status(500).json({ error: "Server error" });
   }
-
-  return res.json(user);
-})
+});
 export default router;
