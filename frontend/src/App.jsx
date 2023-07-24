@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Write from "./pages/Write";
+import Profile from "./pages/Profile";
 import "./App.css";
 import {
   BrowserRouter as Router,
@@ -52,6 +53,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ArticlePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/Home/Profile"
+            element={
+              <PrivateRoute>
+                <Profile />
               </PrivateRoute>
             }
           />

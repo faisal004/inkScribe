@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { userState } from "../../Recoil/stateManagement";
-import {BsFillPenFill} from "react-icons/bs"
+import {BsFillPenFill,} from "react-icons/bs"
+import {BiSolidUserCircle} from "react-icons/bi"
  
 import { useRecoilState } from "recoil";
 
@@ -52,6 +53,10 @@ const Navbar = () => {
                   
                 navigate("/Write")
                 }}> <BsFillPenFill/></button>
+                 <button  onClick={() => {
+                  
+                  navigate("Home/Profile")
+                  }} className="font-semibold hover:underline" >Profile</button>
               <button
                 className="bg-black text-white rounded-full py-1 px-2"
                 onClick={() => {
@@ -61,6 +66,7 @@ const Navbar = () => {
               >
                 Logout
               </button>
+             
 
             </div>
               
