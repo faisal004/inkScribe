@@ -41,7 +41,10 @@ const Signup = () => {
         });
       } else {
         localStorage.setItem("token", apiResponse.token);
-        setUser(true);
+        setUser({
+          isLoggedIn: true,
+          username: apiResponse.username, 
+        });
         console.log("API Response:", apiResponse);
         toast.success("Success", {
           position: "bottom-center",

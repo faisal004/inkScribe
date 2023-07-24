@@ -10,7 +10,7 @@ import { useRecoilState } from "recoil";
 const Navbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useRecoilState(userState);
-  // const setUser = useSetRecoilState(userState);
+
 
   const [scrollPosition, setScrollPosition] = useState(0);
   const [scrollBgColor, setScrollBgColor] = useState("bg-yellow-500");
@@ -55,7 +55,7 @@ const Navbar = () => {
                 }}> <BsFillPenFill/></button>
                  <button  onClick={() => {
                   
-                  navigate("Home/Profile")
+                  navigate(`Home/Profile/${user.username}`)
                   }} className="font-semibold hover:underline" >Profile</button>
               <button
                 className="bg-black text-white rounded-full py-1 px-2"

@@ -3,7 +3,7 @@ import { TextField } from "@mui/material";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useSetRecoilState, useRecoilValueLoadable } from "recoil";
+import { useSetRecoilState, useRecoilValueLoadable} from "recoil";
 import { loginState, loginAPI,userState } from "../../Recoil/stateManagement";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const setLoginData = useSetRecoilState(loginState);
-  const setUser=useSetRecoilState(userState);
+  const setUser = useSetRecoilState(userState);
   const loginAPILoadable = useRecoilValueLoadable(loginAPI);
 
   const handleChange = (e) => {
@@ -43,7 +43,10 @@ const Login = () => {
       }else{
         localStorage.setItem("token", apiResponse.token);
         
-      setUser(true);
+        setUser({
+          isLoggedIn: true,
+          username: apiResponse.username, 
+        });
       toast.success("Logged in successfully", {
         position: "bottom-center",
         autoClose: 5000,
@@ -76,7 +79,10 @@ const Login = () => {
   
     if (authToken) {
       console.log("Setting userState to true...");
-      setUser(true);
+      setUser({
+        isLoggedIn: true,
+     
+      });
     }
   }, [setUser]);
 
