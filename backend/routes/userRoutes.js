@@ -20,7 +20,7 @@ router.post("/Signup", async (req, res) => {
       const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
         expiresIn: "5h",
       });
-      res.json({ message: "User Created SuccessFully", token });
+      res.json({ message: "User Created SuccessFully", token,username });
     }
   } catch (error) {
     res.status(500).json({ message: "server error" });
@@ -38,7 +38,7 @@ router.post("/Login", async (req, res) => {
         const token = jwt.sign({ username, role: "user" }, process.env.SECRET, {
           expiresIn: "1h",
         });
-        res.json({ message: "Logged in successfully", token });
+        res.json({ message: "Logged in successfully", token ,username});
       } else {
         // Passwords do not match
         res.status(403).json({ message: "Invalid username or password" });
@@ -87,5 +87,16 @@ router.post("/PostBlog", authenticateJwt, async (req, res) => {
 router.get("/PostBlog",authenticateJwt,async(req,res)=>{
   const post= await Post.find({});
   res.json({post});
+})
+
+router.get("/:username", async (req,res)=>{
+  const {username}=req.params;
+  const user = await User.findOne({ username})
+  
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  return res.json(user);
 })
 export default router;
