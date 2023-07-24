@@ -22,9 +22,7 @@ const Home = () => {
     const fetchPosts = async () => {
       try {
         const response = await fetch("http://localhost:3000/PostBlog");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+     
         const data = await response.json();
         setArticles(data.posts);
       } catch (error) {
