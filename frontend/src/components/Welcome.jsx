@@ -1,4 +1,10 @@
+import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { userState } from "../../Recoil/stateManagement";
+
 const Welcome = () => {
+  const navigate=useNavigate();
+  const [user] = useRecoilState(userState);
   return (
     <>
       <div className="bg-yellow-500 flex flex-col p-3 border-b-2 border-black ">
@@ -10,9 +16,14 @@ const Welcome = () => {
             Discover stories, thinking, and expertise <br /> from writers on any
             topic.
           </div>
-          <button className="bg-black text-white rounded-full md:w-1/6 w-1/2 px-3 py-2 mt-4 mb-14">
+          {user?(   <button onClick={()=>
+          navigate("/Home")} className="bg-black text-white rounded-full md:w-1/6 w-1/2 px-3 py-2 mt-4 mb-14">
+            Read
+          </button>):(   <button onClick={()=>
+          navigate("/Login")} className="bg-black text-white rounded-full md:w-1/6 w-1/2 px-3 py-2 mt-4 mb-14">
             Get started
-          </button>
+          </button>)}
+       
         </div>
       </div>
       <div className="grid grid-cols-2">
