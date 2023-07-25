@@ -4,7 +4,7 @@ import Post from "../models/Post.js";
 import { authenticateJwt } from "../middleware/auth.js";
 import "dotenv/config";
 const router = express.Router();
-import jwt from "jsonwebtoken";
+
 
 router.put("/PostBlog/:PostId?", authenticateJwt, async (req, res) => {
   const { PostId } = req.params;
@@ -42,7 +42,32 @@ router.get("/PostBlog", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-router.get("/PostBlog/:PostId", authenticateJwt,async (req, res) => {
+router.get("/PostBlog/trending", async (req, res) => {
+  try {
+    const posts = await Post.find({});
+
+    const validPosts = posts.filter(
+      (post) => post.saves !== undefined && post.likes !== undefined
+    );
+
+    validPosts.forEach((post) => {
+      post.savesTimesLikes = post.saves.length * post.likes.length;
+    });
+
+    validPosts.sort(
+      (postA, postB) => postB.savesTimesLikes - postA.savesTimesLikes
+    );
+
+    const topThreePosts = validPosts.slice(0, 3);
+
+    return res.json({ topThreePosts });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/PostBlog/:PostId", authenticateJwt, async (req, res) => {
   const { PostId } = req.params;
 
   try {
@@ -80,18 +105,74 @@ router.patch(
 
       if (liked && !alreadyLiked) {
         post.likes.push(userId);
+        user.likedPosts.push(req.params.PostId);
       } else if (!liked && alreadyLiked) {
         post.likes = post.likes.filter((like) => !like.equals(userId));
+        user.likedPosts = user.likedPosts.filter(
+          (postId) => !postId.equals(req.params.PostId)
+        );
       }
 
       await post.save();
+      await user.save();
 
-      return res.json({ likes: post.likes.length });
+      return res.json({
+        likes: post.likes.length,
+        user: user.likedPosts.length,
+      });
     } catch (err) {
       console.error("Error updating likes:", err);
       return res.status(500).json({ error: "Internal server error" });
     }
   }
 );
+router.patch(
+  "/PostBlog/:PostId/UpdateSaves",
+  authenticateJwt,
+  async (req, res) => {
+    const { saved } = req.body;
 
+    try {
+      const post = await Post.findById(req.params.PostId);
+      const user = await User.findOne({ username: req.user.username });
+
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+
+      const userId = user._id;
+
+      if (!post) {
+        return res.status(404).json({ error: "Post not found" });
+      }
+      console.log(userId);
+      if (!post.saves) {
+        post.saves = [];
+      }
+
+      const alreadySaved = post.saves.includes(userId);
+
+      if (saved && !alreadySaved) {
+        post.saves.push(userId);
+        user.savedPosts.push(req.params.PostId);
+      } else if (!saved && alreadySaved) {
+        post.saves = post.saves.filter((save) => !save.equals(userId));
+        user.savedPosts = user.savedPosts.filter(
+          (postId) => !postId.equals(req.params.PostId)
+        );
+      }
+
+      await post.save();
+      await user.save();
+
+      return res.json({
+        saves: post.saves.length,
+        user: user.savedPosts.length,
+      });
+    } catch (err) {
+      console.error("Error updating likes:", err);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
 export default router;

@@ -17,10 +17,12 @@ const postSchema = new mongoose.Schema(
       },
     ],
    
-    saves: {
-      type: Number,
-      default: 0,
-    },
+    saves: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     photos: {
       type: String,
       default: "",
