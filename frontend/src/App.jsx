@@ -49,7 +49,15 @@ function App() {
             }
           />
              <Route
-            path="/Blog/:PostId"
+            path="Home/Blog/:PostId"
+            element={
+              <PrivateRoute>
+                <ArticlePage />
+              </PrivateRoute>
+            }
+          />
+                 <Route
+            path="Blog/:PostId"
             element={
               <PrivateRoute>
                 <ArticlePage />
