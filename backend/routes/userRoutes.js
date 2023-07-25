@@ -84,7 +84,7 @@ router.get("/PostBlog", authenticateJwt, async (req, res) => {
   res.json({ post });
 });
 
-router.get("/:username", async (req, res) => {
+router.get("/:username",authenticateJwt, async (req, res) => {
   const { username } = req.params;
   try {
     const user = await User.findOne({ username }).populate("publishedPost");
