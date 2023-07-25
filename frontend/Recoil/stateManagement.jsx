@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 import { selector } from "recoil";
-
+import { BASE_URL } from "../config";
 
 
 export const userState = atom({
@@ -42,5 +42,41 @@ export const editorState = atom({
     title: "",
     mainContent: "",
     photos: null,
+  },
+});
+
+export const heartFilledState = atom({
+  key: 'heartFilledState',
+  default: false,
+});
+
+export const postState = atom({
+  key: 'postState',
+  default: null,
+});
+
+
+export const postIdState = atom({
+  key: 'postIdState',
+  default: null,
+});
+
+
+export const fetchPostData = selector({
+  key: 'fetchPostData',
+  get: async ({ get }) => {
+    const PostId = get(postIdState);
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`${BASE_URL}/PostBlog/${PostId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return data.post;
   },
 });

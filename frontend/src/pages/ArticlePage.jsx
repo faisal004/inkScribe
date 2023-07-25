@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { BASE_URL } from "../../config";
@@ -7,51 +8,80 @@ import {
   AiFillHeart,
   AiOutlineSave,
 } from "react-icons/ai";
+import { useRecoilState, useRecoilValueLoadable } from "recoil";
+import { fetchPostData, postIdState } from "../../Recoil/stateManagement";
 
 const ArticlePage = () => {
-  const [post, setPost] = useState(null);
-  const [heartFilled, setHeartFilled] = useState(false);
+  const [heartFilled, setHeartFilled] = useState("");
   const [saveFilled, setSaveFilled] = useState(false);
   const { PostId } = useParams();
 
+  const [postId, setPostId] = useRecoilState(postIdState);
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        console.log(token);
-        const response = await fetch(`${BASE_URL}/PostBlog/` + PostId, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-
-        setPost(data.post);
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      }
-    };
-
-    fetchPost();
-  }, [PostId]);
+    setPostId(PostId);
+  }, [PostId, setPostId]);
+  const postDataLoadable = useRecoilValueLoadable(fetchPostData);
+  const post =
+    postDataLoadable.state === "hasValue" ? postDataLoadable.contents : null;
+  console.log(post);
+  console.log("sfdsd");
 
   if (!post) {
     return <div>Loading...</div>;
   }
 
-  const handleHeartClick = () => {
+  const handleHeartClick = async () => {
     setHeartFilled((prevState) => !prevState);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/PostBlog/${PostId}/UpdateLike`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            liked: !heartFilled,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error updating likes:", error);
+    }
   };
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     setSaveFilled((prevState) => !prevState);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${BASE_URL}/PostBlog/${PostId}/UpdateSaves`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            saved: !saveFilled,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error updating likes:", error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Rest of the component JSX */}
       <header className="py-6 bg-slate-50 text-black text-center">
         <h1 className="text-4xl font-bold">{post.title}</h1>
       </header>
@@ -64,7 +94,12 @@ const ArticlePage = () => {
             alt="Profile"
           />
         </div>
-        <h2 className="text-xl font-medium p-2">{post.creator.username}</h2>
+        <Link to={`/Home/Profile/${post.creator.username}`}>
+          {" "}
+          <h2 className="text-xl font-medium p-2 hover:underline">
+            {post.creator.username}
+          </h2>{" "}
+        </Link>
         <p className="text-slate-500 p-2">
           {Math.ceil(post.mainContent.split(" ").length / 200)} min read
         </p>
@@ -73,8 +108,7 @@ const ArticlePage = () => {
             {heartFilled ? <AiFillHeart color="red" /> : <AiOutlineHeart />}
           </div>
           <div onClick={handleSaveClick}>
-            {saveFilled?<AiFillSave color="black" />:<AiOutlineSave/>}
-            
+            {saveFilled ? <AiFillSave color="black" /> : <AiOutlineSave />}
           </div>
         </div>
       </main>

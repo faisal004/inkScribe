@@ -2,69 +2,85 @@ import { Link } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSetRecoilState, useRecoilValueLoadable } from "recoil";
+import { useSetRecoilState} from "recoil";
 import {
-  signupState,
-  signupAPI,
+  
   userState,
 } from "../../Recoil/stateManagement";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { BASE_URL } from "../../config";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const setSignupData = useSetRecoilState(signupState);
+
   const setUser = useSetRecoilState(userState);
-  const signupAPILoadable = useRecoilValueLoadable(signupAPI);
+
+
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSignupData((prevData) => ({
+    setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const apiResponse = signupAPILoadable.contents;
+    try {
+      const response = await fetch(`${BASE_URL}/user/Signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (signupAPILoadable.state === "hasValue") {
-      if (apiResponse.message === "User Exist") {
-        toast.warn("User Exists", {
-          position: "bottom-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.message === "User Exist") {
+          toast.warn("User Exists", {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          localStorage.setItem("token", data.token);
+          setUser({
+            isLoggedIn: true,
+            username: data.username,
+          });
+          toast.success("Success", {
+            position: "bottom-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+          setTimeout(() => {
+            navigate("/Home");
+          }, 1000);
+        }
       } else {
-        localStorage.setItem("token", apiResponse.token);
-        setUser({
-          isLoggedIn: true,
-          username: apiResponse.username, 
-        });
-        console.log("API Response:", apiResponse);
-        toast.success("Success", {
-          position: "bottom-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-        setTimeout(() => {
-          navigate("/Home")
-          
-        }, 1000);
+        console.error("API Error:", data.error);
       }
-    } else if (signupAPILoadable.state === "loading") {
-      console.log("API call in progress...");
-    } else if (signupAPILoadable.state === "hasError") {
-      console.error("API Error:", signupAPILoadable.contents);
+    } catch (err) {
+      console.error("API Error:", err);
     }
   };
 
@@ -98,6 +114,7 @@ const Signup = () => {
               id="password"
               label="password"
               name="password"
+              type="password"
               onChange={handleChange}
               variant="outlined"
               required
