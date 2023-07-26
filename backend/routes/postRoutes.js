@@ -42,30 +42,7 @@ router.get("/PostBlog", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-router.get("/PostBlog/trending", async (req, res) => {
-  try {
-    const posts = await Post.find({});
 
-    const validPosts = posts.filter(
-      (post) => post.saves !== undefined && post.likes !== undefined
-    );
-
-    validPosts.forEach((post) => {
-      post.savesTimesLikes = post.saves.length * post.likes.length;
-    });
-
-    validPosts.sort(
-      (postA, postB) => postB.savesTimesLikes - postA.savesTimesLikes
-    );
-
-    const topThreePosts = validPosts.slice(0, 3);
-
-    return res.json({ topThreePosts });
-  } catch (err) {
-    console.error("Error fetching posts:", err);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 router.get("/PostBlog/:PostId", authenticateJwt, async (req, res) => {
   const { PostId } = req.params;

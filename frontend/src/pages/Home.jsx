@@ -4,7 +4,7 @@ import Trending from "../components/Trending";
 import { BASE_URL } from "../../config";
 const Home = () => {
   const [articles, setArticles] = useState([]);
-  const [trendingarticles, setTrendingArticles] = useState([]);
+
   const [loading, setisLoading] = useState(true);
 
   const timeAgo = (timestamp) => {
@@ -32,41 +32,49 @@ const Home = () => {
         console.error("Error fetching posts:", error);
       }
     };
-    const fetchTrendingPosts = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/PostBlog/Trending`);
-
-        const data = await response.json();
-        setTrendingArticles(data.topThreePosts);
-        setisLoading(false);
-        console.log(data.topThreePosts);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
 
     fetchPosts();
-    fetchTrendingPosts();
   }, []);
+
+  const validPosts = articles.filter(
+    (post) => post.saves !== undefined && post.likes !== undefined
+  );
+
+  validPosts.forEach((post) => {
+    post.savesTimesLikes = post.saves.length * post.likes.length;
+  });
+
+  validPosts.sort(
+    (postA, postB) => postB.savesTimesLikes - postA.savesTimesLikes
+  );
+
+  const topThreePosts = validPosts.slice(0, 3);
+  console.log(topThreePosts + "dsds");
 
   return (
     <div className="pt-2 bg-slate-50 ">
       <div className="container mx-auto my-3 ">
-        <div className="mx-24 font-bold  text-2xl mb-3">TRENDING</div>
-        {!loading?(<div className="mx-24 grid  md:grid-cols-3 grid-cols-1 gap-4">
-          {trendingarticles.map((ta) => (
-            <Trending
-            _id={ta._id}
-              key={ta._id}
-              photoSrc={ta.photos}
-              text={ta.title}
-              maintext={ta.mainContent}
-            />
-          ))}
-        </div>):(  "Loading")}
-        
+        <div className="mx-24 font-bold  text-2xl mb-3">
+          TRENDING ON INKSCIBE
+        </div>
+        {!loading ? (
+          <div className="mx-24 grid  md:grid-cols-3 grid-cols-1 gap-4">
+            {topThreePosts.map((ta) => (
+              <Trending
+                _id={ta._id}
+                key={ta._id}
+                photoSrc={ta.photos}
+                text={ta.title}
+                maintext={ta.mainContent}
+              />
+            ))}
+          </div>
+        ) : (
+          "Loading"
+        )}
+
         <div className="grid  grid-cols-1  ">
-          {articles.map((article) => (
+          {articles.slice().reverse().map((article) => (
             <ArticleCard
               _id={article._id}
               key={article._id}
@@ -75,7 +83,7 @@ const Home = () => {
               articleImage={article.photos}
               articleContent={article.mainContent}
               readtime={Math.ceil(article.mainContent.split(" ").length / 200)}
-              timestamp={timeAgo(article.updatedAt)}
+              timestamp={timeAgo(article.createdAt)}
             />
           ))}
         </div>
