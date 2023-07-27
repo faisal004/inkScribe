@@ -1,7 +1,8 @@
+import 'dotenv/config';
 import mongoose from "mongoose"
 const connectDB = async () => {
     try {
-      const connect = await mongoose.connect("mongodb://0.0.0.0:27017/INKSCRIBE");
+      const connect = await mongoose.connect(process.env.DATABASE);
       console.log(
         "Database connected: ",
         connect.connection.host,
