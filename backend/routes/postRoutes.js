@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import express from "express";
 import User from "../models/userModel.js";
 import Post from "../models/Post.js";
@@ -6,30 +7,28 @@ import "dotenv/config";
 const router = express.Router();
 
 
-router.put("/PostBlog/:PostId?", authenticateJwt, async (req, res) => {
+router.put("/PostBlog/:PostId", authenticateJwt, async (req, res) => {
   const { PostId } = req.params;
 
-  if (PostId) {
-    try {
-      const post = await Post.findByIdAndUpdate(PostId, req.body, {
-        new: true,
-      });
-      if (!post) {
-        return res.status(404).json({ error: "Post not found" });
-      }
-      return res.json({ post });
-    } catch (err) {
-      console.error("Error fetching post:", err);
-      return res.status(500).json({ error: "Internal server error" });
+  if (!PostId || !mongoose.Types.ObjectId.isValid(PostId)) {
+    return res.status(400).json({ error: "Invalid PostId" });
+  }
+
+  try {
+    const post = await Post.findOneAndUpdate(
+      { _id: PostId }, // Provide the filter object
+      req.body,
+      { new: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
     }
-  } else {
-    try {
-      const posts = await Post.find({});
-      return res.json({ posts });
-    } catch (err) {
-      console.error("Error fetching posts:", err);
-      return res.status(500).json({ error: "Internal server error" });
-    }
+
+    return res.json({ post });
+  } catch (err) {
+    console.error("Error fetching post:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 router.get("/PostBlog", async (req, res) => {
