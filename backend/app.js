@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import Postrouter from "./routes/postRoutes.js"
 
 const app = express();
-const port =process.env.PORT|| 3000;
+const port =process.env.PORT;
 connectDB();
 app.use(cors());
 app.use(bodyParser.json());
